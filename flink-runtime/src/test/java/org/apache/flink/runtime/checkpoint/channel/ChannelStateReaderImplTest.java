@@ -91,16 +91,16 @@ public class ChannelStateReaderImplTest {
 		reader.readInputData(CHANNEL, getBuffer(DATA.length));
 	}
 
-	@Test(expected = Exception.class)
+	@Test(expected = IllegalStateException.class)
 	public void testReadClosed() throws Exception {
 		reader.close();
 		reader.readInputData(CHANNEL, getBuffer(DATA.length));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testReadWrongChannelState() throws IOException {
-		InputChannelInfo wrongChannel = new InputChannelInfo(CHANNEL.getGateIdx() + 1, CHANNEL.getInputChannelIdx() + 1);
-		reader.readInputData(wrongChannel, getBuffer(DATA.length));
+	@Test
+	public void testReadUnknownChannelState() throws IOException {
+		InputChannelInfo unknownChannel = new InputChannelInfo(CHANNEL.getGateIdx() + 1, CHANNEL.getInputChannelIdx() + 1);
+		assertEquals(NO_MORE_DATA, reader.readInputData(unknownChannel, getBuffer(DATA.length)));
 	}
 
 	private TaskStateSnapshot taskStateSnapshot(Collection<InputChannelStateHandle> inputChannelStateHandles) {
@@ -128,28 +128,19 @@ public class ChannelStateReaderImplTest {
 		return buf;
 	}
 
-	private ChannelStateDeserializer deserializer(byte[] data) {
-		return new ChannelStateDeserializer() {
-			@Override
-			public void readHeader(InputStream stream) {
-			}
-
-			@Override
-			public int readLength(InputStream stream) {
-				return data.length;
-			}
-
-			@Override
-			public int readData(InputStream stream, ChannelStateByteBuffer buffer, int bytes) throws IOException {
-				return buffer.writeBytes(stream, bytes);
-			}
-		};
-	}
-
 	private ChannelStateReaderImpl getReader(InputChannelInfo channel, byte[] data) {
 		return new ChannelStateReaderImpl(
 			taskStateSnapshot(singletonList(new InputChannelStateHandle(channel, new ByteStreamStateHandle("", data), singletonList(0L)))),
-			deserializer(DATA));
+			new ChannelStateSerializerImpl() {
+				@Override
+				public void readHeader(InputStream stream) {
+				}
+
+				@Override
+				public int readLength(InputStream stream) {
+					return data.length;
+				}
+			});
 	}
 
 	private void readAndVerify(int bufferSize, InputChannelInfo channelInfo, byte[] data, ChannelStateReader reader) throws IOException {

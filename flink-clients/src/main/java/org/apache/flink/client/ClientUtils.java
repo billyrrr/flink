@@ -43,6 +43,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import static org.apache.flink.util.FlinkUserCodeClassLoader.NOOP_EXCEPTION_HANDLER;
 import static org.apache.flink.util.Preconditions.checkNotNull;
 
 /**
@@ -70,7 +71,7 @@ public enum ClientUtils {
 			configuration.getString(CoreOptions.CLASSLOADER_RESOLVE_ORDER);
 		FlinkUserCodeClassLoaders.ResolveOrder resolveOrder =
 			FlinkUserCodeClassLoaders.ResolveOrder.fromString(classLoaderResolveOrder);
-		return FlinkUserCodeClassLoaders.create(resolveOrder, urls, parent, alwaysParentFirstLoaderPatterns);
+		return FlinkUserCodeClassLoaders.create(resolveOrder, urls, parent, alwaysParentFirstLoaderPatterns, NOOP_EXCEPTION_HANDLER);
 	}
 
 	public static JobExecutionResult submitJob(
@@ -121,7 +122,7 @@ public enum ClientUtils {
 			Configuration configuration,
 			PackagedProgram program,
 			boolean enforceSingleJobExecution,
-			boolean forbidBlockingJobClient) throws ProgramInvocationException {
+			boolean suppressSysout) throws ProgramInvocationException {
 		checkNotNull(executorServiceLoader);
 		final ClassLoader userCodeClassLoader = program.getUserCodeClassLoader();
 		final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
@@ -135,14 +136,14 @@ public enum ClientUtils {
 				configuration,
 				userCodeClassLoader,
 				enforceSingleJobExecution,
-				forbidBlockingJobClient);
+				suppressSysout);
 
 			StreamContextEnvironment.setAsContext(
 				executorServiceLoader,
 				configuration,
 				userCodeClassLoader,
 				enforceSingleJobExecution,
-				forbidBlockingJobClient);
+				suppressSysout);
 
 			try {
 				program.invokeInteractiveModeForExecution();

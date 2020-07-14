@@ -58,7 +58,7 @@ public class ProgramDeployer {
 		this.jobName = jobName;
 	}
 
-	public CompletableFuture<? extends JobClient> deploy() {
+	public CompletableFuture<JobClient> deploy() {
 		LOG.info("Submitting job {} for query {}`", pipeline, jobName);
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Submitting job {} with configuration: \n{}", pipeline, configuration);
@@ -68,7 +68,7 @@ public class ProgramDeployer {
 			throw new RuntimeException("No execution.target specified in your configuration file.");
 		}
 
-		PipelineExecutorServiceLoader executorServiceLoader = DefaultExecutorServiceLoader.INSTANCE;
+		PipelineExecutorServiceLoader executorServiceLoader = new DefaultExecutorServiceLoader();
 		final PipelineExecutorFactory executorFactory;
 		try {
 			executorFactory = executorServiceLoader.getExecutorFactory(configuration);
@@ -77,7 +77,7 @@ public class ProgramDeployer {
 		}
 
 		final PipelineExecutor executor = executorFactory.getExecutor(configuration);
-		CompletableFuture<? extends JobClient> jobClient;
+		CompletableFuture<JobClient> jobClient;
 		try {
 			jobClient = executor.execute(pipeline, configuration);
 		} catch (Exception e) {

@@ -101,20 +101,12 @@ There are two ways to add Hive dependencies. First is to use Flink's bundled Hiv
 
 The following tables list all available bundled hive jars. You can pick one to the `/lib/` directory in Flink distribution.
 
-{% if site.is_stable %}
-
 | Metastore version | Maven dependency             | SQL Client JAR         |
 | :---------------- | :--------------------------- | :----------------------|
-| 1.0.0 - 1.2.2     | `flink-connector-hive-1.2.2` | [Download](http://central.maven.org/maven2/org/apache/flink/flink-sql-connector-hive-1.2.2{{site.scala_version_suffix}}/{{site.version}}/flink-sql-connector-hive-1.2.2{{site.scala_version_suffix}}-{{site.version}}.jar) |
-| 2.0.0 - 2.2.0     | `flink-connector-hive-2.2.0` | [Download](http://central.maven.org/maven2/org/apache/flink/flink-sql-connector-hive-2.2.0{{site.scala_version_suffix}}/{{site.version}}/flink-sql-connector-hive-2.2.0{{site.scala_version_suffix}}-{{site.version}}.jar) |
-| 2.3.0 - 2.3.6     | `flink-connector-hive-2.3.6` | [Download](http://central.maven.org/maven2/org/apache/flink/flink-sql-connector-hive-2.3.6{{site.scala_version_suffix}}/{{site.version}}/flink-sql-connector-hive-2.3.6{{site.scala_version_suffix}}-{{site.version}}.jar) |
-| 3.0.0 - 3.1.2     | `flink-connector-hive-3.1.2` | [Download](http://central.maven.org/maven2/org/apache/flink/flink-sql-connector-hive-3.1.2{{site.scala_version_suffix}}/{{site.version}}/flink-sql-connector-hive-3.1.2{{site.scala_version_suffix}}-{{site.version}}.jar) |
-
-{% else %}
-
-These tables are only available for stable releases.
-
-{% endif %}
+| 1.0.0 - 1.2.2     | `flink-sql-connector-hive-1.2.2` | {% if site.is_stable %}[Download](https://repo.maven.apache.org/maven2/org/apache/flink/flink-sql-connector-hive-1.2.2{{site.scala_version_suffix}}/{{site.version}}/flink-sql-connector-hive-1.2.2{{site.scala_version_suffix}}-{{site.version}}.jar) {% else %} Only available for stable releases {% endif %} |
+| 2.0.0 - 2.2.0     | `flink-sql-connector-hive-2.2.0` | {% if site.is_stable %}[Download](https://repo.maven.apache.org/maven2/org/apache/flink/flink-sql-connector-hive-2.2.0{{site.scala_version_suffix}}/{{site.version}}/flink-sql-connector-hive-2.2.0{{site.scala_version_suffix}}-{{site.version}}.jar) {% else %} Only available for stable releases {% endif %} |
+| 2.3.0 - 2.3.6     | `flink-sql-connector-hive-2.3.6` | {% if site.is_stable %}[Download](https://repo.maven.apache.org/maven2/org/apache/flink/flink-sql-connector-hive-2.3.6{{site.scala_version_suffix}}/{{site.version}}/flink-sql-connector-hive-2.3.6{{site.scala_version_suffix}}-{{site.version}}.jar) {% else %} Only available for stable releases {% endif %} |
+| 3.0.0 - 3.1.2     | `flink-sql-connector-hive-3.1.2` | {% if site.is_stable %}[Download](https://repo.maven.apache.org/maven2/org/apache/flink/flink-sql-connector-hive-3.1.2{{site.scala_version_suffix}}/{{site.version}}/flink-sql-connector-hive-3.1.2{{site.scala_version_suffix}}-{{site.version}}.jar) {% else %} Only available for stable releases {% endif %} |
 
 #### User defined dependencies
 
@@ -311,7 +303,7 @@ Take Hive version 2.3.4 for example:
 <div data-lang="Java" markdown="1">
 {% highlight java %}
 
-EnvironmentSettings settings = EnvironmentSettings.newInstance().useBlinkPlanner().inBatchMode().build();
+EnvironmentSettings settings = EnvironmentSettings.newInstance().inBatchMode().build();
 TableEnvironment tableEnv = TableEnvironment.create(settings);
 
 String name            = "myhive";
@@ -329,7 +321,7 @@ tableEnv.useCatalog("myhive");
 <div data-lang="Scala" markdown="1">
 {% highlight scala %}
 
-val settings = EnvironmentSettings.newInstance().useBlinkPlanner().inBatchMode().build()
+val settings = EnvironmentSettings.newInstance().inBatchMode().build()
 val tableEnv = TableEnvironment.create(settings)
 
 val name            = "myhive"
@@ -364,8 +356,9 @@ catalogs:
 
 ## DDL
 
-DDL to create Hive tables, views, partitions, functions within Flink will be supported soon.
+It's recommended to use [Hive dialect]({{ site.baseurl }}/dev/table/hive/hive_dialect.html) to execute DDLs to create
+Hive tables, views, partitions, functions within Flink.
 
 ## DML
 
-Flink supports DML writing to Hive tables. Please refer to details in [Reading & Writing Hive Tables]({{ site.baseurl }}/dev/table/hive/read_write_hive.html)
+Flink supports DML writing to Hive tables. Please refer to details in [Reading & Writing Hive Tables]({{ site.baseurl }}/dev/table/hive/hive_read_write.html)
