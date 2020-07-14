@@ -49,6 +49,9 @@ class HashCode(ScalarFunction):
 
 table_env = BatchTableEnvironment.create(env)
 
+# configure the off-heap memory of current taskmanager to enable the python worker uses off-heap memory.
+table_env.get_config().get_configuration().set_string("taskmanager.memory.task.off-heap.size", '80m')
+
 # 注册Python函数
 table_env.register_function("hash_code", udf(HashCode(), DataTypes.BIGINT(), DataTypes.BIGINT()))
 
@@ -58,6 +61,10 @@ my_table.select("string, bigint, bigint.hash_code(), hash_code(bigint)")
 # 在SQL API中使用Python函数
 table_env.sql_query("SELECT string, bigint, hash_code(bigint) FROM MyTable")
 {% endhighlight %}
+
+<span class="label label-info">Note</span> If not using RocksDB as state backend, you can also configure the python
+worker to use the managed memory of taskmanager by setting **python.fn-execution.memory.managed** to be **true**.
+Then there is no need to set the the configuration **taskmanager.memory.task.off-heap.size**.
 
 它还支持在Python Table API程序中使用Java / Scala标量函数。
 
@@ -77,6 +84,9 @@ public class HashCode extends ScalarFunction {
 
 table_env = BatchTableEnvironment.create(env)
 
+# configure the off-heap memory of current taskmanager to enable the python worker uses off-heap memory.
+table_env.get_config().get_configuration().set_string("taskmanager.memory.task.off-heap.size", '80m')
+
 # 注册Java函数
 table_env.register_java_function("hash_code", "my.java.function.HashCode")
 
@@ -86,6 +96,10 @@ my_table.select("string.hash_code(), hash_code(string)")
 # 在SQL API中使用Java函数
 table_env.sql_query("SELECT string, bigint, hash_code(string) FROM MyTable")
 {% endhighlight %}
+
+<span class="label label-info">Note</span> If not using RocksDB as state backend, you can also configure the python
+worker to use the managed memory of taskmanager by setting **python.fn-execution.memory.managed** to be **true**.
+Then there is no need to set the the configuration **taskmanager.memory.task.off-heap.size**.
 
 除了扩展基类`ScalarFunction`之外，还有许多函数可以定义Python标量函数。
 以下示例显示了定义Python标量函数的不同函数，该函数需要两列(column) 
@@ -133,7 +147,8 @@ my_table.select("add(a, b)")
 任意数量的行(row)作为输出而不是单个值。 Python UDTF（用户定义的Table函数）的返回类型
 可以是Iterable，Iterator或generator的类型。
 
-<span class="label label-info">注意</span> 当前，旧计划器（planner)在流和批处理模式下都支持Python UDTF，而在Blink计划器中，仅在流模式下才支持Python UDTF。
+<!-- TODO: confirm that the following notice is deprecated  -->
+<!-- <span class="label label-info">注意</span> 当前，旧计划器（planner)在流和批处理模式下都支持Python UDTF，而在Blink计划器中，仅在流模式下才支持Python UDTF。 -->
 
 以下示例说明了如何定义自己的Python多发出函数，并将其注册到
 TableEnvironment，并在查询中调用它。
@@ -148,6 +163,9 @@ env = StreamExecutionEnvironment.get_execution_environment()
 table_env = StreamTableEnvironment.create(env)
 my_table = ...  # type: Table, table schema: [a: String]
 
+# configure the off-heap memory of current taskmanager to enable the python worker uses off-heap memory.
+table_env.get_config().get_configuration().set_string("taskmanager.memory.task.off-heap.size", '80m')
+
 # 注册Python Table函数
 table_env.register_function("split", udtf(Split(), DataTypes.STRING(), [DataTypes.STRING(), DataTypes.INT()]))
 
@@ -161,6 +179,9 @@ table_env.sql_query("SELECT a, word, length FROM MyTable LEFT JOIN LATERAL TABLE
 
 {% endhighlight %}
 
+<span class="label label-info">Note</span> If not using RocksDB as state backend, you can also configure the python
+worker to use the managed memory of taskmanager by setting **python.fn-execution.memory.managed** to be **true**.
+Then there is no need to set the the configuration **taskmanager.memory.task.off-heap.size**.
 
 它还支持在Python Table API程序中使用Java / Scala表函数。
 {% highlight python %}
@@ -185,6 +206,9 @@ env = StreamExecutionEnvironment.get_execution_environment()
 table_env = StreamTableEnvironment.create(env)
 my_table = ...  # type: Table, table schema: [a: String]
 
+# configure the off-heap memory of current taskmanager to enable the python worker uses off-heap memory.
+table_env.get_config().get_configuration().set_string("taskmanager.memory.task.off-heap.size", '80m')
+
 # 注册java函数。
 table_env.register_java_function("split", "my.java.function.Split")
 
@@ -200,6 +224,10 @@ table_env.sql_query("SELECT a, word, length FROM MyTable, LATERAL TABLE(split(a)
 # LEFT JOIN一个表函数（等同于Table API中的"left_outer_join"）。
 table_env.sql_query("SELECT a, word, length FROM MyTable LEFT JOIN LATERAL TABLE(split(a)) as T(word, length) ON TRUE")
 {% endhighlight %}
+
+<span class="label label-info">Note</span> If not using RocksDB as state backend, you can also configure the python
+worker to use the managed memory of taskmanager by setting **python.fn-execution.memory.managed** to be **true**.
+Then there is no need to set the the configuration **taskmanager.memory.task.off-heap.size**.
 
 像Python标量函数一样，您可以使用上述五种方式来定义Python TableFunction。
 

@@ -3,7 +3,6 @@ title: 'Detecting Patterns in Tables'
 nav-parent_id: streaming_tableapi
 nav-title: 'Detecting Patterns'
 nav-pos: 5
-is_beta: true
 ---
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
@@ -67,9 +66,9 @@ FROM MyTable
 
 This page will explain each keyword in more detail and will illustrate more complex examples.
 
-<span class="label label-danger">Attention</span> Flink's implementation of the `MATCH_RECOGNIZE`
+{% info Notice %}  Flink's implementation of the `MATCH_RECOGNIZE`
 clause is a subset of the full standard. Only those features documented in the following sections
-are supported. Since the development is still in an early phase, please also take a look at the
+are supported. Additional features may be supported based on community feeback, please also take a look at the
 [known limitations](#known-limitations).
 
 * This will be replaced by the TOC
@@ -93,7 +92,7 @@ project.
 {% endhighlight %}
 
 Alternatively, you can also add the dependency to the cluster classpath (see the
-[dependency section]({{ site.baseurl}}/dev/projectsetup/dependencies.html) for more information).
+[dependency section]({{ site.baseurl}}/dev/project-configuration.html) for more information).
 
 If you want to use the `MATCH_RECOGNIZE` clause in the
 [SQL Client]({{ site.baseurl}}/dev/table/sqlClient.html), you don't have to do anything as all the
@@ -1038,7 +1037,7 @@ use [time attributes](time_attributes.html). To select those there are available
       <td><p>Returns the timestamp of the last row that was mapped to the given pattern.</p>
       <p>The resulting attribute is a <a href="time_attributes.html">rowtime attribute</a>
          that can be used in subsequent time-based operations such as
-         <a href="#joins">time-windowed joins</a> and <a href="#aggregations">group window or over
+         <a href="#joins">interval joins</a> and <a href="#aggregations">group window or over
          window aggregations</a>.</p></td>
     </tr>
     <tr>
@@ -1047,7 +1046,7 @@ use [time attributes](time_attributes.html). To select those there are available
       </td>
       <td><p>Returns a <a href="time_attributes.html#processing-time">proctime attribute</a>
           that can be used in subsequent time-based operations such as
-          <a href="#joins">time-windowed joins</a> and <a href="#aggregations">group window or over
+          <a href="#joins">interval joins</a> and <a href="#aggregations">group window or over
           window aggregations</a>.</p></td>
     </tr>
   </tbody>
